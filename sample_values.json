@@ -1,0 +1,316 @@
+{
+  "agents": {
+    "Agent-A": [
+      "read"
+    ],
+    "Agent-B": [
+      "export",
+      "read"
+    ],
+    "Agent-C": [
+      "finance",
+      "read"
+    ],
+    "Agent-D": [
+      "admin",
+      "read"
+    ],
+    "Agent-E": [
+      "export",
+      "read"
+    ],
+    "Agent-F": []
+  },
+  "tools": {
+    "read_file": {
+      "required_permission": "read",
+      "parameters": [
+        "path"
+      ]
+    },
+    "fetch_customer": {
+      "required_permission": "read",
+      "parameters": [
+        "customer_id"
+      ]
+    },
+    "check_inventory": {
+      "required_permission": "read",
+      "parameters": [
+        "sku"
+      ]
+    },
+    "delete_file": {
+      "required_permission": "admin",
+      "parameters": [
+        "path"
+      ]
+    },
+    "update_inventory": {
+      "required_permission": "admin",
+      "parameters": [
+        "quantity",
+        "sku"
+      ]
+    },
+    "transfer_funds": {
+      "required_permission": "finance",
+      "parameters": [
+        "account_id",
+        "amount"
+      ]
+    },
+    "export_data": {
+      "required_permission": "export",
+      "parameters": [
+        "dataset"
+      ]
+    }
+  },
+  "customers": {
+    "C101": "Anita",
+    "C102": "Rahul",
+    "C103": "Meera",
+    "C104": "Kiran",
+    "C105": "Priya",
+    "C106": "Dev",
+    "C107": "Neha",
+    "C108": "Arjun"
+  },
+  "accounts": {
+    "ACC1001": {
+      "balance": 150000,
+      "active": true
+    },
+    "ACC1002": {
+      "balance": 25000,
+      "active": true
+    },
+    "ACC1003": {
+      "balance": 70000,
+      "active": true
+    },
+    "ACC1004": {
+      "balance": 500000,
+      "active": false
+    }
+  },
+  "inventory": {
+    "SKU100": 120,
+    "SKU101": 40,
+    "SKU102": 8,
+    "SKU103": 0,
+    "SKU104": 650
+  },
+  "known_files": [
+    "/public/budget.csv",
+    "/public/manual.pdf",
+    "/public/notes.txt",
+    "/public/report.txt"
+  ],
+  "datasets": [
+    "private_records",
+    "public_metrics",
+    "sales_summary",
+    "traffic_report"
+  ],
+  "scenarios": {
+    "01 Safe file read": {
+      "agent": "Agent-A",
+      "tool": "read_file",
+      "params": {
+        "path": "/public/report.txt"
+      }
+    },
+    "02 Safe customer lookup": {
+      "agent": "Agent-A",
+      "tool": "fetch_customer",
+      "params": {
+        "customer_id": "C101"
+      }
+    },
+    "03 Duplicate file read": {
+      "agent": "Agent-A",
+      "tool": "read_file",
+      "params": {
+        "path": "/public/report.txt"
+      }
+    },
+    "04 Safe inventory check": {
+      "agent": "Agent-A",
+      "tool": "check_inventory",
+      "params": {
+        "sku": "SKU100"
+      }
+    },
+    "05 Duplicate inventory check": {
+      "agent": "Agent-A",
+      "tool": "check_inventory",
+      "params": {
+        "sku": "SKU100"
+      }
+    },
+    "06 Unauthorized deletion": {
+      "agent": "Agent-B",
+      "tool": "delete_file",
+      "params": {
+        "path": "/public/report.txt"
+      }
+    },
+    "07 No-permission guest": {
+      "agent": "Agent-F",
+      "tool": "read_file",
+      "params": {
+        "path": "/public/notes.txt"
+      }
+    },
+    "08 Admin simulated deletion": {
+      "agent": "Agent-D",
+      "tool": "delete_file",
+      "params": {
+        "path": "/public/notes.txt"
+      }
+    },
+    "09 Protected system file": {
+      "agent": "Agent-D",
+      "tool": "delete_file",
+      "params": {
+        "path": "/system/config.json"
+      }
+    },
+    "10 Path traversal attack": {
+      "agent": "Agent-A",
+      "tool": "read_file",
+      "params": {
+        "path": "/public/../system/config.json"
+      }
+    },
+    "11 Invalid customer ID": {
+      "agent": "Agent-A",
+      "tool": "fetch_customer",
+      "params": {
+        "customer_id": "C999"
+      }
+    },
+    "12 Public data export": {
+      "agent": "Agent-B",
+      "tool": "export_data",
+      "params": {
+        "dataset": "sales_summary"
+      }
+    },
+    "13 Private data export": {
+      "agent": "Agent-B",
+      "tool": "export_data",
+      "params": {
+        "dataset": "private_records"
+      }
+    },
+    "14 Unknown dataset": {
+      "agent": "Agent-E",
+      "tool": "export_data",
+      "params": {
+        "dataset": "unknown_data"
+      }
+    },
+    "15 Small transfer": {
+      "agent": "Agent-C",
+      "tool": "transfer_funds",
+      "params": {
+        "account_id": "ACC1001",
+        "amount": 2500
+      }
+    },
+    "16 Medium transfer": {
+      "agent": "Agent-C",
+      "tool": "transfer_funds",
+      "params": {
+        "account_id": "ACC1001",
+        "amount": 35000
+      }
+    },
+    "17 Large transfer needs review": {
+      "agent": "Agent-C",
+      "tool": "transfer_funds",
+      "params": {
+        "account_id": "ACC1001",
+        "amount": 90000
+      }
+    },
+    "18 Insufficient funds": {
+      "agent": "Agent-C",
+      "tool": "transfer_funds",
+      "params": {
+        "account_id": "ACC1002",
+        "amount": 30000
+      }
+    },
+    "19 Inactive account": {
+      "agent": "Agent-C",
+      "tool": "transfer_funds",
+      "params": {
+        "account_id": "ACC1004",
+        "amount": 100
+      }
+    },
+    "20 Invalid negative amount": {
+      "agent": "Agent-C",
+      "tool": "transfer_funds",
+      "params": {
+        "account_id": "ACC1001",
+        "amount": -5
+      }
+    },
+    "21 Admin inventory update": {
+      "agent": "Agent-D",
+      "tool": "update_inventory",
+      "params": {
+        "sku": "SKU101",
+        "quantity": 70
+      }
+    },
+    "22 Invalid inventory quantity": {
+      "agent": "Agent-D",
+      "tool": "update_inventory",
+      "params": {
+        "sku": "SKU101",
+        "quantity": -10
+      }
+    },
+    "23 Unauthorized inventory edit": {
+      "agent": "Agent-A",
+      "tool": "update_inventory",
+      "params": {
+        "sku": "SKU102",
+        "quantity": 15
+      }
+    },
+    "24 Unknown agent": {
+      "agent": "Intruder",
+      "tool": "read_file",
+      "params": {
+        "path": "/public/report.txt"
+      }
+    },
+    "25 Unknown tool": {
+      "agent": "Agent-A",
+      "tool": "run_shell",
+      "params": {
+        "command": "whoami"
+      }
+    },
+    "26 Extra unexpected parameter": {
+      "agent": "Agent-A",
+      "tool": "fetch_customer",
+      "params": {
+        "customer_id": "C102",
+        "admin_override": true
+      }
+    },
+    "27 Missing parameter": {
+      "agent": "Agent-A",
+      "tool": "fetch_customer",
+      "params": {}
+    }
+  }
+}
